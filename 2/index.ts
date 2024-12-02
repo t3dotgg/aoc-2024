@@ -13,28 +13,20 @@ function safeLine(numlist: number[]) {
 
 function a() {
   const nums = lines.map((r) => r.split(" ").map((n) => parseInt(n, 10)));
-
-  const safe = nums.filter((numlist) => safeLine(numlist));
-
-  console.log(safe.length);
+  return nums.filter((numlist) => safeLine(numlist));
 }
 
 function b() {
   const nums = lines.map((r) => r.split(" ").map((n) => parseInt(n, 10)));
 
-  const res = nums.filter((numlist) => {
+  return nums.filter((numlist) => {
     if (safeLine(numlist)) return true;
 
-    // Check with 1 removed
     for (let i = 0; i < numlist.length; i++) {
-      const newList = [...numlist];
-      newList.splice(i, 1);
-      if (safeLine(newList)) return true;
+      if (safeLine(numlist.toSpliced(i, 1))) return true;
     }
   });
-
-  console.log(res.length);
 }
 
-a();
-b();
+console.log(a().length);
+console.log(b().length);
