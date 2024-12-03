@@ -19,45 +19,30 @@ function a() {
 
   console.log(sum);
 }
-// Match do() with regex
-const doRegex = /do\(\)/g;
-// match don't() with regex
-const dontRegex = /don't\(\)/g;
+
+// Match do(), don't(), and mul(x,y) with a single regex
+const instructionRegex = /do\(\)|don't\(\)|mul\((\d+),(\d+)\)/g;
 
 function b() {
   const allLinesCombined = lines.join("");
 
-  // Get all matches for each regex
-  const doMatches = [...allLinesCombined.matchAll(doRegex)];
-  const dontMatches = [...allLinesCombined.matchAll(dontRegex)];
-  const mulMatches = [...allLinesCombined.matchAll(mulRegex)];
-
-  // Combine all matches with their indices to sort by position
-  const allMatches = [
-    ...doMatches.map((m) => ({ type: "do", index: m.index })),
-    ...dontMatches.map((m) => ({ type: "dont", index: m.index })),
-    ...mulMatches.map((m) => ({
-      type: "mul",
-      index: m.index,
-      x: parseInt(m[1], 10),
-      y: parseInt(m[2], 10),
-    })),
-  ];
-
-  // Sort by index to get instructions in order
-  const sortedInstructions = allMatches.sort((a, b) => a.index - b.index);
+  // Get all matches with a single regex
+  const matches = [...allLinesCombined.matchAll(instructionRegex)];
 
   let doo = true;
   let sum = 0;
 
-  for (const instruction of sortedInstructions) {
-    if (instruction.type === "do") {
+  for (const match of matches) {
+    const instruction = match[0];
+    if (instruction === "do()") {
       doo = true;
-    } else if (instruction.type === "dont") {
+    } else if (instruction === "don't()") {
       doo = false;
-    } else if (instruction.type === "mul") {
+    } else if (instruction.startsWith("mul")) {
       if (doo) {
-        sum += instruction.x * instruction.y;
+        const x = parseInt(match[1], 10);
+        const y = parseInt(match[2], 10);
+        sum += x * y;
       }
     }
   }
