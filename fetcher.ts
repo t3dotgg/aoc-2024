@@ -19,6 +19,32 @@ function getDay() {
   return new Date().getDate() + 1;
 }
 
-console.log(getDay());
+function waitUntilTime(
+  hour: number,
+  minute: number,
+  second: number
+): Promise<void> {
+  return new Promise((resolve) => {
+    const check = () => {
+      const now = new Date();
+      const target = new Date();
+      target.setHours(hour, minute, second, 0);
 
-getOrWriteInput(getDay());
+      if (now >= target) {
+        resolve();
+      } else {
+        setTimeout(check, 100);
+      }
+    };
+    check();
+  });
+}
+
+async function main() {
+  await waitUntilTime(21, 0, 1);
+  const day = getDay();
+  console.log(`Fetching input for day ${day}`);
+  await getOrWriteInput(day);
+}
+
+main();
