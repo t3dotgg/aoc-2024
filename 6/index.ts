@@ -36,18 +36,17 @@ type Direction = keyof typeof directions;
 function getNextLocation(
   currentLocation: [number, number],
   currentDirection: Direction,
-  hp2?: Set<string>
-): {
-  nextLocation: [number, number];
-  nextDirection: Direction;
-  outOfBounds: boolean;
-} {
-  const [x, y] = currentLocation;
-  const [dx, dy] = directions[currentDirection];
-  const nextX = x + dx;
-  const nextY = y + dy;
-
-  const hp = hp2 || hashpoints;
+  extraPoint?: string
+):
+  | { outOfBounds: true }
+  | {
+      nextLocation: [number, number];
+      nextDirection: Direction;
+      outOfBounds: false;
+    } {
+  const nextX = currentLocation[0] + directions[currentDirection][0];
+  const nextY = currentLocation[1] + directions[currentDirection][1];
+  const nextPoint = `${nextX},${nextY}`;
 
   // Check if next position is in bounds
   const inBounds =
@@ -55,14 +54,12 @@ function getNextLocation(
 
   if (!inBounds) {
     return {
-      nextLocation: currentLocation,
-      nextDirection: currentDirection,
       outOfBounds: true,
     };
   }
 
   // Check if next position hits a hashpoint
-  if (hp.has(`${nextX},${nextY}`)) {
+  if (hashpoints.has(`${nextX},${nextY}`) || extraPoint === nextPoint) {
     return {
       nextLocation: currentLocation,
       nextDirection: turns[currentDirection],
@@ -84,22 +81,18 @@ function a() {
 
   let currentLocation = start;
   let currentDirection = "N" as Direction;
-  let outOfBounds = false;
 
-  while (
-    !outOfBounds &&
-    !visitedPoints.has(
-      `${currentLocation[0]},${currentLocation[1]},${currentDirection}`
-    )
-  ) {
+  while (true) {
     visitedPoints.add(
       `${currentLocation[0]},${currentLocation[1]},${currentDirection}`
     );
 
     const next = getNextLocation(currentLocation, currentDirection);
+
+    if (next.outOfBounds) break;
+
     currentLocation = next.nextLocation;
     currentDirection = next.nextDirection;
-    outOfBounds = next.outOfBounds;
   }
 
   const pointsNoDirection = new Set<string>();
@@ -112,39 +105,33 @@ function a() {
 }
 
 function gridHasLoop(newHashPoint: [number, number]) {
-  const visitedPoints = new Set<string>();
+  const turnPoints = new Set<string>();
 
   if (hashpoints.has(`${newHashPoint[0]},${newHashPoint[1]}`)) {
     return false;
   }
 
-  const hp = new Set(hashpoints);
-  hp.add(`${newHashPoint[0]},${newHashPoint[1]}`);
+  const nhp = `${newHashPoint[0]},${newHashPoint[1]}`;
 
   let currentLocation = start;
   let currentDirection = "N" as Direction;
-  let outOfBounds = false;
 
-  while (!outOfBounds) {
-    if (
-      visitedPoints.has(
-        `${currentLocation[0]},${currentLocation[1]},${currentDirection}`
-      )
-    ) {
-      return true;
+  while (true) {
+    const next = getNextLocation(currentLocation, currentDirection, nhp);
+    if (next.outOfBounds) return false;
+
+    // Only track points where we turn
+    if (next.nextDirection !== currentDirection) {
+      const key = `${currentLocation[0]},${currentLocation[1]},${currentDirection}`;
+      if (turnPoints.has(key)) {
+        return true;
+      }
+      turnPoints.add(key);
     }
 
-    visitedPoints.add(
-      `${currentLocation[0]},${currentLocation[1]},${currentDirection}`
-    );
-
-    const next = getNextLocation(currentLocation, currentDirection, hp);
     currentLocation = next.nextLocation;
     currentDirection = next.nextDirection;
-    outOfBounds = next.outOfBounds;
   }
-
-  return !outOfBounds;
 }
 
 function b() {
