@@ -3,12 +3,12 @@ import fs from "fs";
 let lines = fs.readFileSync("input.txt", "utf8").split("\n");
 // lines = fs.readFileSync("example.txt", "utf8").split("\n");
 
-function a() {
+function part1() {
   console.log(lines.length);
 }
-function b() {
+function part2() {
   console.log(lines.length);
 }
 
-a();
-// b();
+part1();
+// part2();

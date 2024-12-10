@@ -12,7 +12,7 @@ import fs from "fs";
 
 async function getOrWriteInput(day: number) {
   const input = await getInput(2024, day);
-  fs.writeFileSync(`${day}/input.txt`, input);
+  fs.writeFileSync(`${day}/input.txt`, input.trim());
 }
 
 function getDay() {
