@@ -9,9 +9,7 @@ for (const stone of line.split(" ")) {
   startingStones[num] = (startingStones[num] || 0) + 1;
 }
 
-const memo = new Map<number, number[]>();
-
-function doTransform(stone: number) {
+function transformStone(stone: number) {
   const stoneStr = stone.toString();
   if (stone === 0) {
     return [1];
@@ -22,14 +20,6 @@ function doTransform(stone: number) {
   }
 
   return [stone * 2024];
-}
-
-function transformStone(stone: number) {
-  if (memo.has(stone)) return memo.get(stone)!;
-
-  const result = doTransform(stone);
-  memo.set(stone, result);
-  return result;
 }
 
 type StoneCount = { [key: number]: number };
@@ -64,7 +54,6 @@ function part1() {
 }
 
 function part2() {
-  memo.clear(); // Clear memoization for fresh start
   const result = countStonesAfterBlinks(75);
   console.log("Part 2:", result);
 }
